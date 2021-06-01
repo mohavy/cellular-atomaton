@@ -14,7 +14,20 @@ function getCursorPosition(canvas, event) {
     const rect = canvas.getBoundingClientRect()
     const x = event.clientX - rect.left
     const y = event.clientY - rect.top
-    drawCell((x-(x%step))/step, (y-(y%step))/step, step, step)
+    switch (event.which) {
+    	case 1:
+    		drawCell((x-(x%step))/step, (y-(y%step))/step, step, step);
+    		console.log(ctx.strokeStyle);
+    		console.log("left");
+    		break;
+    	case 3:
+    		eraseCell((x-(x%step))/step, (y-(y%step))/step, step, step);
+    		console.log(ctx.strokeStyle);
+    		console.log("right");
+    		break;
+
+    }
+    
     console.log("x: " + x + " y: " + y)
 }
 
@@ -29,7 +42,7 @@ var drawGrid = function(ctx, w, h, step) {
 	}
 	// set the color of the line
 	ctx.strokeStyle = 'rgb(0,0,0)';
-	ctx.lineWidth = 0.2;
+	ctx.lineWidth = .2;
 	// the stroke will actually paint the current path 
 	ctx.stroke(); 
 	// for the sake of the example 2nd path
@@ -41,16 +54,17 @@ var drawGrid = function(ctx, w, h, step) {
 	// set the color of the line
 	ctx.strokeStyle = 'rgb(0,20,20)';
 	// just for fun
-	ctx.lineWidth = 0.2;
+	ctx.lineWidth = .2;
 	// for your original question - you need to stroke only once
 	ctx.stroke(); 
 };
-var drawCell = function(coX, coY) {
-	ctx.beginPath();
-	ctx.strokeStyle = 'rgb(0,0,0)';
-	ctx.rect(coX*step, coY*step, step, step);
-	ctx.stroke();
-	ctx.fill();
-}
 drawGrid(ctx, w, h, step);
+var drawCell = function(coX, coY) {
+	ctx.fillStyle = '#000000';
+	ctx.fillRect(coX*step, coY*step, step, step);
+}
+var eraseCell = function(coX, coY) {
+	ctx.fillStyle = '#FFFFFF';
+	ctx.fillRect(coX*step, coY*step, step, step);
+}
 drawCell(0, 0);
