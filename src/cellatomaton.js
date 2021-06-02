@@ -9,26 +9,27 @@ var canvas = document.getElementById(canvasElementId);
 canvas.width  = w;
 canvas.height = h;
 var ctx = canvas.getContext('2d');
+var activeCells = {};
 // the render logic should be focusing on the rendering 
 function getCursorPosition(canvas, event) {
-    const rect = canvas.getBoundingClientRect()
-    const x = event.clientX - rect.left
-    const y = event.clientY - rect.top
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    const mouseX = (x-(x%step))/step;
+    const mouseY = (y-(y%step))/step;
+    let coords = [mouseX, mouseY];
     switch (event.which) {
     	case 1:
-    		drawCell((x-(x%step))/step, (y-(y%step))/step, step, step);
-    		console.log(ctx.strokeStyle);
-    		console.log("left");
+    		let cell = new Cell(mouseX, mouseY);
+    		cell.born();
     		break;
     	case 3:
-    		eraseCell((x-(x%step))/step, (y-(y%step))/step, step, step);
-    		console.log(ctx.strokeStyle);
-    		console.log("right");
+    		let dieCell = activeCells[coords];
+    		dieCell.die();
     		break;
 
     }
-    
-    console.log("x: " + x + " y: " + y)
+    console.log(activeCells);
 }
 
 canvas.addEventListener('mousedown', function(e) {
@@ -52,19 +53,33 @@ var drawGrid = function(ctx, w, h, step) {
 			ctx.lineTo(w, y);
 	}
 	// set the color of the line
-	ctx.strokeStyle = 'rgb(0,20,20)';
+	ctx.strokeStyle = 'rgb(0,0,0)';
 	// just for fun
 	ctx.lineWidth = .2;
 	// for your original question - you need to stroke only once
 	ctx.stroke(); 
 };
 drawGrid(ctx, w, h, step);
-var drawCell = function(coX, coY) {
-	ctx.fillStyle = '#000000';
-	ctx.fillRect(coX*step, coY*step, step, step);
-}
+
 var eraseCell = function(coX, coY) {
 	ctx.fillStyle = '#FFFFFF';
-	ctx.fillRect(coX*step, coY*step, step, step);
+	ctx.fillRect((coX*step)+1, (coY*step)+1, step-2, step-2);
 }
-drawCell(0, 0);
+class Cell {
+	constructor(x, y) {
+		this.x = x;
+		this.y = y;
+	}
+	born() {
+		ctx.fillStyle = '#000000';
+		ctx.fillRect((this.x*step)+1, (this.y*step)+1, step-2, step-2);
+		let coords = [this.x, this.y];
+		activeCells[coords] = this;
+	}
+	die() {
+		ctx.fillStyle = '#FFFFFF';
+		ctx.fillRect((this.x*step)+1, (this.y*step)+1, step-2, step-2);
+		let coords = [this.x, this.y];
+		delete activeCells[coords];
+	}
+}
